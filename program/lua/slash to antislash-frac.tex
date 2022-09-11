@@ -1,0 +1,126 @@
+
+% !TEX TS-program = lualatex
+\documentclass{article}
+
+%packages
+\usepackage[utf8]{inputenc}
+
+\usepackage[parfill]{parskip}
+
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{float}
+
+\usepackage{listingsutf8}
+\usepackage{hyperref}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{comment}
+
+\usepackage{fullpage}
+
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{color0}{RGB}{147, 147, 147}
+\definecolor{color1}{RGB}{186, 033, 033}
+\definecolor{color2}{RGB}{000, 128, 000}
+\definecolor{color3}{RGB}{064, 128, 128}
+\definecolor{color4}{RGB}{170, 034, 255}
+
+
+
+
+\usepackage{luacode} % for 'luacode' environment
+\begin{luacode}
+	function inline_to_disp ( s ) 
+	s = s:gsub ( "(%b())%s-/%s-(%b())" , function (u,v)
+	u = u:sub(2,-2)  -- strip off the parentheses
+	v = v:sub(2,-2)
+	return "\\dfrac{"..u.."}{"..v.."}" 
+	end )
+	return s
+	end
+\end{luacode}
+
+%% LaTeX-side code:
+\newcommand\InlineToDispOn{\directlua{%
+	luatexbase.add_to_callback("process_input_buffer", 
+	inline_to_disp, "InlineToDisp" )}}
+\newcommand\InlineToDispOff{\directlua{%
+	luatexbase.remove_from_callback("process_input_buffer", 
+	"InlineToDisp" )}}
+
+%\AtBeginDocument{\InlineToDispOn} %activate by default
+
+\newenvironment{centerEquationFrac}{
+%	\InlineToDispOn
+	\begin{equation}
+		\begin{split}
+	}{
+		\end{split}
+\end{equation}
+%\InlineToDispOff
+}
+
+
+
+\title{slash to antislash-frac}
+\author{Neon }
+\date{September 2022}
+
+
+
+\begin{document}
+	\maketitle
+	
+	\section{Introduction}
+
+	\begin{equation}
+		\begin{split}
+			(x+5)/(y-4) \quad (x) / (y)  &= (2(x+5))/(y-4) \\ &= 2(x+5)/ (y-4) \quad x/y
+		\end{split}
+	\end{equation}
+
+	\begin{equation}
+		\begin{split}
+			\InlineToDispOn
+			(x+5)/(y-4) \quad (x) / (y)  &= (2(x+5))/(y-4) \\ &= 2(x+5)/ (y-4) \quad x/y
+			\InlineToDispOff
+		\end{split}
+	\end{equation}
+
+	\InlineToDispOn
+		\begin{equation}
+			\begin{split}
+			(x+5)/(y-4) \quad ( x ) / ((y) / (x))  &= (2(x+5))/(y-4) \\ &= 2(x+5)/ (y-4) \quad x/y
+			\end{split}
+		\end{equation}
+	\InlineToDispOff
+
+	\InlineToDispOn
+		\begin{equation*}
+			\begin{split}
+			\end{split}
+		\end{equation*}
+	\InlineToDispOff
+
+
+
+%	\InlineToDispOn
+%	\begin{centerEquationFrac}
+%		(x+5)/(y-4) \quad (x) / (y) &= (2(x+5))/(y-4) \\ &= 2(x+5)/ (y-4) \quad x/y
+%	\end{centerEquationFrac}
+%	\InlineToDispOff
+
+	
+	hello
+	
+	\bigskip
+	$\displaystyle % same as above, but now with \displaystyle instead of \textstyle
+	(x+5)/(y-4) \quad (x) / (y) \quad (2(x+5))/(y-4) \quad 2(x+5)/ (y-4) \quad x/y$
+\end{document}
+
